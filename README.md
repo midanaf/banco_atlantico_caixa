@@ -34,3 +34,10 @@ Go
 
 Alter TAble Status Add Constraint Horario_Default Default GETDATE() FOR Horario
 Go
+
+Alter Table Notas Add Quantidade int not null default(0)
+Go
+
+
+Alter Table Notas add constraint valor_unico unique(Valor)
+Go

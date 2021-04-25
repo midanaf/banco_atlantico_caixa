@@ -6,5 +6,6 @@ namespace BA.Caixa.Domain.Interfaces
     public interface INotaRepository
     {
         List<Notas> Listar();
+        void Atualizar(Notas notas);
     }
 }

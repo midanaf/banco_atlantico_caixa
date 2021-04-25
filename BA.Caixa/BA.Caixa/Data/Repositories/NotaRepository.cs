@@ -16,6 +16,12 @@ namespace BA.Caixa.Data.Repositories
             _context = context;
         }
 
+        public void Atualizar(Notas notas)
+        {
+            _context.Update(notas);
+            _context.SaveChanges();
+        }
+
         public List<Notas> Listar()
         {
             return _context.Notas.AsNoTracking().ToList();

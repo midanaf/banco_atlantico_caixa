@@ -6,5 +6,6 @@ namespace BA.Caixa.Domain.Entities
     {
         public Guid Id { get; set; }
         public int Valor { get; set; }
+        public int Quantidade { get; set; }
     }
 }

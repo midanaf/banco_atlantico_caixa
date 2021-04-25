@@ -1,5 +1,6 @@
 ﻿using BA.Caixa.Application.Interfaces;
 using BA.Caixa.Controllers.Shared;
+using BA.Caixa.Domain.Entities;
 using BA.Caixa.Domain.Interfaces;
 using BA.Caixa.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -28,15 +29,25 @@ namespace BA.Caixa.Application.Services
             if (saldoCliente < valorSolicitado)
                 return new BadRequestObjectResult("Saldo Insuficiente.");
 
-            var maiorCedula = ObterMaiorCedula();
+            var cedulaInicial = ObterMaiorCedula();
 
+            if (cedulaInicial == null) return new BadRequestObjectResult("Cedulas Insuficiente.");
+
+            var maiorCedula = cedulaInicial.Valor;
             var quantidadeCedula = 0;
+            var quantidadeCedulaDisponivel = cedulaInicial.Quantidade;
 
             while (true)
             {
-                if (valorSolicitado >= maiorCedula)
+
+                if (maiorCedula == 0)
+                {
+                    return new BadRequestObjectResult("Valor Solicitado não pode ser sacado.");
+                }
+                if (valorSolicitado >= maiorCedula && quantidadeCedulaDisponivel > 0)
                 {
                     valorSolicitado -= maiorCedula;
+                    quantidadeCedulaDisponivel -= 1;
                     quantidadeCedula += 1;
                 }
                 else
@@ -52,38 +63,58 @@ namespace BA.Caixa.Application.Services
                     quantidadeCedula = 0;
                     if (valorSolicitado == 0)
                     {
+                        response.Composicao.ForEach(item => { SubtrairNota(item); });
+                        //Chama serviço da conta do cliente para subtrair valor
                         return new OkObjectResult(response);
                     }
-                    if (maiorCedula == 0)
-                    {
-                        return new BadRequestObjectResult("Valor Solicitado não pode ser sacado.");
-                    }
-                    maiorCedula = ObterProximoMaiorValor(maiorCedula);
+                    var maiorValor = ObterProximoMaiorValor(maiorCedula);
+                    maiorCedula = maiorValor.Valor;
+                    quantidadeCedulaDisponivel = maiorValor.Quantidade;
                 }
             }
-
-            return new OkObjectResult("");
         }
 
-        private int ObterProximoMaiorValor(int maiorCedula)
+        private void SubtrairNota(ComposicaoViewModel item)
         {
-            var nota = _notaRepository.Listar().OrderByDescending(n => n.Valor).Select(x => x.Valor).ToArray();
-            var indice = Array.IndexOf(nota, maiorCedula);
+            var nota = _notaRepository.Listar().Where(x => x.Valor == item.Valor).FirstOrDefault();
+            nota.Quantidade = nota.Quantidade - item.Quantidade;
 
-            if (indice > nota.Length)
+            _notaRepository.Atualizar(nota);
+        }
+
+        private Notas ObterProximoMaiorValor(int maiorCedula)
+        {
+            var nota = _notaRepository.Listar().Where(x => x.Quantidade > 0).OrderByDescending(n => n.Valor);
+
+            var valores = nota.Select(x => x.Valor).ToArray();
+            var indice = Array.IndexOf(valores, maiorCedula);
+
+            if (indice > valores.Length)
             {
-                return 0;
+                return null;
             }
 
-            return nota[indice + 1];
+            var valor = valores[indice + 1];
+
+            return nota.FirstOrDefault(x => x.Valor == valor);
         }
 
-        private int ObterMaiorCedula()
+        private Notas ObterMaiorCedula()
         {
-            var nota = _notaRepository.Listar().OrderByDescending(n => n.Valor).FirstOrDefault();
-            return nota.Valor;
+            var nota = _notaRepository.Listar().OrderByDescending(n => n.Valor).FirstOrDefault(x => x.Quantidade > 0);
+
+            if (nota == null)
+            {
+                return null;
+            }
+            return nota;
         }
 
+        /// <summary>
+        /// Obter Saldo do Cliente
+        /// Este método vai se comunicar com serviço da conta do cliente obtendo saldo
+        /// </summary>
+        /// <returns></returns>
         private int ObterSaldoCliente()
         {
             return 2000;

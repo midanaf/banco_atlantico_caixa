@@ -3,7 +3,7 @@ using BA.Caixa.Model;
 
 namespace BA.Caixa.Mapper
 {
-    public static class UsuarioMapper
+    public static class StatusMapper
     {
         public static Status ViewModelToEntity(this StatusViewModel status)
         {
