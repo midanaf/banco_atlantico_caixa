@@ -22,6 +22,7 @@ namespace BA.Caixa.Application.Services
 
         public async Task<IActionResult> Sacar(SaqueRequest saque)
         {
+            if (saque.Valor < 0 || saque.Valor > 10000) return new BadRequestObjectResult("Valor não pode ser Sacado.");
             var valorSolicitado = saque.Valor;
             var response = new SaqueResponse(valorSolicitado);
             var saldoCliente = ObterSaldoCliente();
@@ -68,8 +69,8 @@ namespace BA.Caixa.Application.Services
                         return new OkObjectResult(response);
                     }
                     var maiorValor = ObterProximoMaiorValor(maiorCedula);
-                    maiorCedula = maiorValor.Valor;
-                    quantidadeCedulaDisponivel = maiorValor.Quantidade;
+                    maiorCedula = maiorValor ==null ? 0 : maiorValor.Valor;
+                    quantidadeCedulaDisponivel = maiorValor == null ? 0 : maiorValor.Quantidade;
                 }
             }
         }
