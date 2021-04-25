@@ -41,3 +41,9 @@ Go
 
 Alter Table Notas add constraint valor_unico unique(Valor)
 Go
+
+update Notas set quantidade = 50
+
+#Dados Mockados
+O método ObterSaldoCliente() retorna um valor fixo de 2000
+Este metodo se conecta ao serviço da conta do cliente para obter o saldo.
