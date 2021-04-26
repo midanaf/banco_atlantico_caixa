@@ -2,7 +2,11 @@
 using BA.Caixa.Domain.Interfaces;
 using BA.Caixa.Mapper;
 using BA.Caixa.Model;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BA.Caixa.Application.Services
 {
@@ -15,9 +19,12 @@ namespace BA.Caixa.Application.Services
             _repository = repository;
         }
 
-        public void Cadastrar(StatusViewModel usuario)
+        public async Task<IActionResult> Cadastrar(StatusViewModel status)
         {
-            _repository.Salvar(usuario.ViewModelToEntity());
+            status.Horario = DateTime.Now;
+            _repository.Salvar(status.ViewModelToEntity());
+
+            return new OkObjectResult(status);
         }
 
         public bool Ativo()
@@ -28,16 +35,29 @@ namespace BA.Caixa.Application.Services
             return false;
         }
 
-        public StatusViewModel Obter()
+        public async Task<IActionResult> ObterUltimo()
         {
             var status = _repository.Listar().OrderByDescending(s => s.Horario).FirstOrDefault();
             if (status == null)
             {
-                return null;
+                return new OkObjectResult(new StatusViewModel());
             }
             else
             {
-                return status.EntityToViewModel();
+                return new OkObjectResult(status.EntityToViewModel());
+            }
+        }
+
+        public async Task<IActionResult> Listar()
+        {
+            var status = _repository.Listar().ToList();
+            if (status == null)
+            {
+                return new OkObjectResult(new List<StatusViewModel>());
+            }
+            else
+            {
+                return new OkObjectResult(status.EntityToViewModel());
             }
         }
     }

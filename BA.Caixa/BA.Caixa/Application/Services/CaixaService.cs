@@ -12,14 +12,17 @@ namespace BA.Caixa.Application.Services
     public class CaixaService : ICaixaService
     {
         public INotaRepository _notaRepository;
+        public IStatusService _statusService;
 
-        public CaixaService(INotaRepository notaRepository)
+        public CaixaService(INotaRepository notaRepository, IStatusService statusService)
         {
             _notaRepository = notaRepository;
+            _statusService = statusService;
         }
 
         public async Task<IActionResult> Sacar(SaqueRequest saque)
         {
+            if (!_statusService.Ativo()) return new UnauthorizedObjectResult("Caixa está no modo Inativo.");
             if (saque.Valor < 0 || saque.Valor > 10000) return new BadRequestObjectResult("Valor não pode ser Sacado.");
             var valorSolicitado = saque.Valor;
             var response = new SaqueResponse(valorSolicitado);

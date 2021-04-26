@@ -1,5 +1,6 @@
 ﻿using BA.Caixa.Domain.Entities;
 using BA.Caixa.Model;
+using System.Collections.Generic;
 
 namespace BA.Caixa.Mapper
 {
@@ -25,6 +26,17 @@ namespace BA.Caixa.Mapper
                 Id = status.Id,
                 Nome = status.Nome
             };
+        }
+
+        public static List<StatusViewModel> EntityToViewModel(this List<Status> status)
+        {
+            var resultado = new List<StatusViewModel>();
+            foreach (var item in status)
+            {
+                resultado.Add(item.EntityToViewModel());
+            }
+
+            return resultado;
         }
     }
 }

@@ -50,7 +50,7 @@ namespace BA.Caixa.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
-                return UnprocessableEntity("Não foi possível Sacar o valor solicitado");
+                return UnprocessableEntity("Não foi listar as cedulas.");
             }
         }
     }
