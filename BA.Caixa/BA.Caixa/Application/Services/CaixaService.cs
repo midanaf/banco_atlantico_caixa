@@ -1,11 +1,9 @@
 ﻿using BA.Caixa.Application.Interfaces;
-using BA.Caixa.Controllers.Shared;
 using BA.Caixa.Domain.Entities;
 using BA.Caixa.Domain.Interfaces;
 using BA.Caixa.Model;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -119,6 +117,13 @@ namespace BA.Caixa.Application.Services
         private int ObterSaldoCliente()
         {
             return 2000;
+        }
+
+        public async Task<IActionResult> ListarCedulas()
+        {
+            var cedulas = _notaRepository.Listar();
+
+            return new OkObjectResult(cedulas);
         }
     }
 }

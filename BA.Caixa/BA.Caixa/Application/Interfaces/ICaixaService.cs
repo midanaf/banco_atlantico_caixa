@@ -7,5 +7,6 @@ namespace BA.Caixa.Application.Interfaces
     public interface ICaixaService
     {
         Task<IActionResult> Sacar(SaqueRequest saque);
+        Task<IActionResult> ListarCedulas();
     }
 }

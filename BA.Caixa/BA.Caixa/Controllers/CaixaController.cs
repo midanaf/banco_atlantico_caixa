@@ -1,5 +1,5 @@
 ﻿using BA.Caixa.Application.Interfaces;
-using BA.Caixa.Controllers.Shared;
+using BA.Caixa.Domain.Entities;
 using BA.Caixa.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +23,7 @@ namespace BA.Caixa.Controllers
         }
 
         [HttpPost("Sacar")]
-        [ProducesResponseType(typeof(ApiResult<SaqueResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SaqueResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> Cadastrar([FromBody] SaqueRequest model)
         {
@@ -34,7 +34,23 @@ namespace BA.Caixa.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
-                return UnprocessableEntity(ApiResult.Fail("Não foi possível Sacar o valor solicitado"));
+                return UnprocessableEntity("Não foi possível Sacar o valor solicitado");
+            }
+        }
+
+        [HttpGet("Cedulas")]
+        [ProducesResponseType(typeof(Notas), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<IActionResult> CadasGetCedulastrar()
+        {
+            try
+            {
+                return await _service.ListarCedulas();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return UnprocessableEntity("Não foi possível Sacar o valor solicitado");
             }
         }
     }
